@@ -1,0 +1,14 @@
+DeepSeek V4.1 Flash on a 16 GB M1 Mac mini
+
+This project contains code derived from PipeNetwork/deepseek-v41-mlx,
+commit 8bdd543c7160800f3451d9595c996129b7abecdf, licensed under Apache-2.0.
+https://github.com/PipeNetwork/deepseek-v41-mlx
+
+Local modifications: native_stream.py (bounded SSD reader, native FP4/FP8
+execution, dense weight caching, allocator reuse, compiled decoding), exact
+exponent-scale decoding in dequant.py, native streaming validation tests,
+demo rendering, and this reproduction recipe.
+
+The reference sources under docs/reference originate from DeepSeek's V4.1
+release, redistributed through the upstream project. Their MIT license is
+included at docs/reference/LICENSE. Model weights are not redistributed.
