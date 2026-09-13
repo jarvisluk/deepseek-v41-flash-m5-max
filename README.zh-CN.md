@@ -86,6 +86,11 @@ M5 Max 48GB 的初始安全配置为：
 ./benchmark-m5-max.sh
 ```
 
+在一台 48GB M5 Max 上的首次 3-token 顺序测试结果：低内存档首 token 为 47.98 秒、
+后续为 0.149 token/s；自动档首 token 为 22.68 秒、后续为 0.276 token/s，MLX
+峰值分别约为 6.62GiB 和 14.39GiB。由于自动档是第二个运行，可能受 macOS 文件页
+缓存影响；该结果用于本机配置验证，不应视为严格的跨机器性能结论。
+
 ## 其他机器
 
 内置档位包括 `low-memory`、`apple-32gb`、`apple-48gb`、`m5-max-48gb`、
