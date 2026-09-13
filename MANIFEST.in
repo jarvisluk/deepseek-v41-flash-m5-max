@@ -1,0 +1,22 @@
+include LICENSE
+include NOTICE
+include README.md
+include README.zh-CN.md
+include LOCAL_SETUP.md
+include requirements.txt
+include requirements-test.txt
+include download-model.sh
+include verify-model.sh
+include run-local.sh
+include benchmark-m5-max.sh
+include complete-setup.sh
+include complete-setup.command
+recursive-include docs *
+recursive-include scripts *.py
+recursive-include tests *.py
+recursive-include checksums *.sha256
+prune models
+prune runs
+prune .venv
+global-exclude *.py[cod]
+global-exclude __pycache__

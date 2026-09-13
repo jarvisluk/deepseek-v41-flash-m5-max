@@ -1,5 +1,10 @@
 # DeepSeek V4.1 Flash on a 16 GB M1 Mac mini
 
+[M5 Max / Apple Silicon shareable library guide (简体中文)](README.zh-CN.md)
+
+This checkout also includes hardware-aware runtime profiles and installable CLI
+entry points. The original M1 reproduction and measurements below remain unchanged.
+
 **475 GiB of original FP4/FP8 weights. A 16 GB Mac. About 23 seconds per token.**
 
 This is the recipe and experimental runner behind a real local inference demo.

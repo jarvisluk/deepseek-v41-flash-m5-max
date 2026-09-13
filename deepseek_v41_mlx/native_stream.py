@@ -27,6 +27,7 @@ from .load import load_token_map
 from .model import Block
 from .stream import StreamState, run_layer
 from .hyper_connections import hc_pre
+from .hardware import PROFILES, detect_hardware, resolve_settings
 
 
 class NativeReader:
@@ -244,19 +245,38 @@ def main():
     ap.add_argument('--prompt', default='Hi')
     ap.add_argument('--max-tokens', type=int, default=8)
     ap.add_argument('--raw', action='store_true')
-    ap.add_argument('--dense-cache-gib', type=float, default=0)
+    ap.add_argument('--profile', choices=['auto', *PROFILES], default='auto')
+    ap.add_argument('--memory-limit-gib', type=float)
+    ap.add_argument('--dense-cache-gib', type=float)
+    ap.add_argument('--mlx-cache-mib', type=int)
     ap.add_argument('--reuse-allocator', action='store_true')
     ap.add_argument('--compile-dequant', action='store_true')
     opts = ap.parse_args()
-    if not 0 <= opts.dense_cache_gib <= 6:
-        ap.error('--dense-cache-gib must be between 0 and 6 for this 16 GB runner')
-    mx.set_memory_limit(8*1024**3)
-    mx.set_cache_limit(256*1024**2)
+    hardware = detect_hardware()
+    if hardware.architecture != 'arm64':
+        ap.error(f'Apple Silicon arm64 is required; detected {hardware.architecture}')
+    try:
+        runtime = resolve_settings(
+            opts.profile,
+            info=hardware,
+            memory_limit_gib=opts.memory_limit_gib,
+            dense_cache_gib=opts.dense_cache_gib,
+            mlx_cache_mib=opts.mlx_cache_mib,
+        )
+    except ValueError as exc:
+        ap.error(str(exc))
+    mx.set_memory_limit(int(runtime.memory_limit_gib*1024**3))
+    mx.set_cache_limit(runtime.mlx_cache_mib*1024**2)
     tok = Tokenizer.from_file(str(Path(opts.model)/'tokenizer.json'))
     prompt = opts.prompt if opts.raw else '<｜begin▁of▁sentence｜><｜User｜>'+opts.prompt+'<｜Assistant｜></think>'
     ids = tok.encode(prompt, add_special_tokens=False).ids
+    print(json.dumps(dict(event='runtime_profile', profile=runtime.profile,
+                          chip=hardware.chip, physical_memory_gib=hardware.memory_gib,
+                          memory_limit_gib=runtime.memory_limit_gib,
+                          dense_cache_gib=runtime.dense_cache_gib,
+                          mlx_cache_mib=runtime.mlx_cache_mib)), flush=True)
     model = NativeStream(opts.model, max_seq_len=max(128,len(ids)+opts.max_tokens+16),
-                         dense_cache_bytes=int(opts.dense_cache_gib*1024**3),
+                         dense_cache_bytes=int(runtime.dense_cache_gib*1024**3),
                          aggressive_cleanup=not opts.reuse_allocator, compile_dequant=opts.compile_dequant)
     print(json.dumps(dict(prompt=prompt, input_ids=ids)), flush=True)
     started = time.monotonic()

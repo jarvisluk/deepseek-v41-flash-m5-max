@@ -8,3 +8,6 @@ runs/
 *.partial
 .env
 .env.*
+dist/
+*.egg-info/
+build/
