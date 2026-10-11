@@ -5,7 +5,15 @@ __pycache__/
 models/
 runs/
 *.safetensors
+*.gguf
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.part
 *.partial
+*.incomplete
 .env
 .env.*
 dist/
